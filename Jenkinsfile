@@ -19,8 +19,7 @@ pipeline {
 
         stage('Preparar Paquete') {
             steps {
-                // Empaqueta únicamente lo necesario para el servidor web
-                // Excluye las carpetas pesadas de .git y terraform
+                // Empaqueta únicamente lo necesario para el servidor web (11 KB)
                 sh "zip -r deploy.zip web/ scripts/ appspec.yml"
             }
         }
@@ -34,14 +33,13 @@ pipeline {
         
         stage('Desplegar con CodeDeploy') {
             steps {
-                // Ordena a CodeDeploy iniciar el despliegue en el grupo de servidores.
-                // Incluye banderas críticas para mitigar bloqueos por despliegues previos fallidos.
+                // Ordena a CodeDeploy iniciar el despliegue utilizando el nuevo archivo zip
+                // Mantiene el flag crítico para saltarse el bloqueo del ApplicationStop heredado
                 sh """
                 aws deploy create-deployment \
                     --application-name CiberGuard-App \
                     --deployment-group-name web-servers-dg \
                     --ignore-application-stop-failures \
-                    --update-outdated-instances \
                     --s3-location bucket=ciberguard-artifacts-8a0ba4c0,key=deploy.zip,bundleType=zip
                 """
             }
