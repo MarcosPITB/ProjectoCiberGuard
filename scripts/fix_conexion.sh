@@ -13,7 +13,7 @@ if [ -f "$CACHE_ENDPOINT" ]; then
     
     # Reemplazar la línea de localhost por la del endpoint real en el archivo final
     if [ -f "$TARGET_FILE" ]; then
-        sed -i "s/\$host = \"localhost\";/\$host = \"$REAL_ENDPOINT\";/g" "$TARGET_FILE"
+        sed -i 's/$host = "localhost";/$host = "'"$REAL_ENDPOINT"'/g' "$TARGET_FILE"
         echo "Sustitución en conexion.php completada con éxito."
     else
         echo "ERROR: El archivo conexion.php no fue encontrado por CodeDeploy."
@@ -22,7 +22,7 @@ else
     echo "ADVERTENCIA: No se encontró el archivo temporal /tmp/db_endpoint.txt."
 fi
 
-# 2. Asegurar permisos correctos para Nginx
+# 2. Asegurar permisos correctos para Nginx y el volumen compartido
 echo "Corrigiendo permisos de la carpeta web compartida..."
 chown -R www-data:www-data /var/www/html
 chmod -R 775 /var/www/html

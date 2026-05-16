@@ -17,7 +17,7 @@ pipeline {
 
         stage('Preparar Paquete') {
             steps {
-                // Empaquetado estricto incluyendo la carpeta de scripts críticos de CodeDeploy
+                // Empaquetado estricto incluyendo los componentes y hooks de CodeDeploy
                 sh "zip -r deploy.zip web/ scripts/ appspec.yml"
             }
         }

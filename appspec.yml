@@ -1,10 +1,10 @@
 version: 0.0
 os: linux
 files:
-  - source: /web
+  - source: web/
     destination: /var/www/html/
 hooks:
-  ApplicationStart:
-    - location: scripts/restart_services.sh
-      timeout: 300
+  AfterInstall:
+    - location: scripts/fix_conexion.sh
+      timeout: 180
       runas: root
