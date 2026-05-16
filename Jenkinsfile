@@ -33,13 +33,15 @@ pipeline {
         
         stage('Desplegar con CodeDeploy') {
             steps {
-                // Ordena a CodeDeploy iniciar el despliegue utilizando el nuevo archivo zip
-                // Mantiene el flag crítico para saltarse el bloqueo del ApplicationStop heredado
+                // Ordena a CodeDeploy iniciar el despliegue utilizando el nuevo archivo zip.
+                // --ignore-application-stop-failures: Salta bloqueos fantasmas del pasado.
+                // --file-exists-behavior OVERWRITE: Solución crítica para evitar colisiones en el EFS compartido.
                 sh """
                 aws deploy create-deployment \
                     --application-name CiberGuard-App \
                     --deployment-group-name web-servers-dg \
                     --ignore-application-stop-failures \
+                    --file-exists-behavior OVERWRITE \
                     --s3-location bucket=ciberguard-artifacts-8a0ba4c0,key=deploy.zip,bundleType=zip
                 """
             }
