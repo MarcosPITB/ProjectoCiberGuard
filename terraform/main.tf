@@ -1,24 +1,24 @@
 # ==============================================================================
-# PLANTILLA DE LANZAMIENTO (LAUNCH TEMPLATE) PARA LOS SERVIDORES WEB
+# CONFIGURACIÓN DEL PROVEEDOR Y RECURSOS DE DATOS GLOBALES
 # ==============================================================================
-resource "aws_launch_template" "ciberguard_web_template" {
-  name_prefix   = "ciberguard-web-"
-  image_id      = data.aws_ami.ubuntu.id  # Utiliza dinámicamente la AMI de Ubuntu de tus filtros
-  instance_type = "t2.micro"
+provider "aws" { 
+  region = var.region 
+}
 
-  # Asegúrate de mantener tus bloques existentes aquí:
-  # iam_instance_profile { name = ... }
-  # network_interfaces { ... }
+# Obtiene las zonas de disponibilidad dinámicas de la región
+data "aws_availability_zones" "available" {}
 
-  # ESTO ES LO CRUCIAL: Mapeamos el script inyectando las variables de AWS
-  user_data = base64encode(
-    templatefile("${path.module}/setup_nginx.sh", {
-      efs_id      = aws_efs_file_system.ciberguard_efs.id
-      db_endpoint = element(split(":", aws_db_instance.cyberguard_db.endpoint), 0)
-    })
-  )
-
-  lifecycle {
-    create_before_destroy = true
+# Filtra y encuentra la AMI oficial más reciente de Ubuntu 22.04 LTS
+data "aws_ami" "ubuntu" {
+  most_recent = true
+  owners      = ["099720109477"] # Canonical
+  filter {
+    name   = "name"
+    values = ["ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-amd64-server-*"]
   }
+}
+
+# Genera un sufijo aleatorio único para evitar colisiones de nombres en S3
+resource "random_id" "suffix" { 
+  byte_length = 4 
 }

@@ -36,12 +36,14 @@ resource "aws_launch_template" "lt" {
     security_groups = [aws_security_group.web_sg.id]
   }
 
+  # Renderizado dinámico del script pasando todas las variables de entorno más el endpoint limpio
   user_data = base64encode(templatefile("${path.module}/setup_nginx.sh", {
-    db_name = var.db_name
-    db_user = var.db_user
-    db_pass = var.db_password
-    db_port = var.db_port
-    efs_id  = aws_efs_file_system.shared_code.id
+    db_name     = var.db_name
+    db_user     = var.db_user
+    db_pass     = var.db_password
+    db_port     = var.db_port
+    efs_id      = aws_efs_file_system.shared_code.id
+    db_endpoint = element(split(":", aws_db_instance.db.endpoint), 0)
   }))
 }
 
