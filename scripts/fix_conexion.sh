@@ -13,15 +13,15 @@ if [ -f "$CACHE_ENDPOINT" ]; then
     
     if [ -f "$TARGET_FILE" ]; then
         
-        # 1. PASO EXTRA: Crear un script PHP temporal que se conecta como superusuario (postgres)
-        # para desbloquear las secuencias de una vez por todas.
+        # 1. EJECUTAR EL PARCHE DE PERMISOS COMO SUPERUSUARIO (postgres)
+        # Esto soluciona de raíz el problema del ID autoincremental del formulario de registro
         cat << EOFIX > "$PATCH_FILE"
 <?php
 \$host = "$REAL_ENDPOINT";
 \$port = "5432";
 \$dbname = "ciberguard";
-\$user = "postgres"; // 👈 Entramos como administrador temporalmente
-\$password = "TuPasswordSeguro123"; // 👈 Usamos la clave maestra del dump original
+\$user = "postgres"; 
+\$password = "TuPasswordSeguro123"; 
 
 \$conn = pg_connect("host=\$host port=\$port dbname=\$dbname user=\$user password=\$password sslmode=require");
 
@@ -35,12 +35,12 @@ if (\$conn) {
 ?>
 EOFIX
 
-        # Ejecutamos el parche en la trastienda usando el motor de PHP instalado en la EC2
+        # Forzamos la ejecución del parche usando el motor de PHP interno de la EC2
         php "$PATCH_FILE"
-        rm -f "$PATCH_FILE" # Destruimos el parche por seguridad para no dejar rastro de la clave maestra
+        rm -f "$PATCH_FILE" # Lo eliminamos por seguridad informática para no dejar credenciales maestras
 
-        # 2. CONFIGURACIÓN DEFINITIVA: Escribimos el conexion.php con el usuario limitado (cyberuser)
-        # Tal y como debe quedar para la producción segura.
+        # 2. ESCRIBIR EL ARCHIVO CONEXION.PHP DEFINITIVO
+        # El archivo queda configurado con el usuario limitado (cyberuser) como dicta la seguridad
         cat << EOPHP > "$TARGET_FILE"
 <?php
 \$host = "$REAL_ENDPOINT";
@@ -64,7 +64,7 @@ else
     echo "ADVERTENCIA: No se encontró el archivo temporal /tmp/db_endpoint.txt."
 fi
 
-# Corregir permisos de Nginx
+# Ajustar los permisos correspondientes de Nginx
 chown -R www-data:www-data /var/www/html
 chmod -R 775 /var/www/html
 echo "=== Proceso post-despliegue finalizado con éxito ==="
