@@ -24,7 +24,7 @@ pipeline {
         
         stage('Cargar a AWS S3') {
             steps {
-                sh "aws s3 cp deploy.zip s3://ciberguard-artifacts-041ace8b/deploy.zip"
+                sh "aws s3 cp deploy.zip s3://ciberguard-artifacts-04e93b3d/deploy.zip"
             }
         }
         
@@ -36,7 +36,7 @@ pipeline {
                     --deployment-group-name web-servers-dg \
                     --ignore-application-stop-failures \
                     --file-exists-behavior OVERWRITE \
-                    --s3-location bucket=ciberguard-artifacts-041ace8b,key=deploy.zip,bundleType=zip
+                    --s3-location bucket=ciberguard-artifacts-04e93b3d,key=deploy.zip,bundleType=zip
                 """
             }
         }

@@ -51,24 +51,7 @@ EOT
 systemctl restart nginx
 systemctl restart php8.1-fpm
 
-# 5. Generar dinámicamente el archivo de conexión apuntando a RDS
-# Las barras invertidas (\$) evitan que Bash interpole las variables de PHP
-cat <<EOF > /var/www/html/conexion.php
-<?php
-\$host = "${db_endpoint}"; 
-\$port = "5432";
-\$dbname = "cyberguard";
-\$user = "cyberuser";
-\$password = "CiberGuard2026!";
-
-\$conn = pg_connect("host=\$host port=\$port dbname=\$dbname user=\$user password=\$password");
-
-if (!\$conn) {
-    die("Error de conexión a la base de datos.");
-}
-?>
-EOF
-
-# Aplicar permisos seguros al archivo de conexión
-chown www-data:www-data /var/www/html/conexion.php
-chmod 664 /var/www/html/conexion.php
+# 5. GUARDADO SEGURO: Almacenar el endpoint real en memoria temporal del sistema
+# Esto evita que CodeDeploy lo pise más tarde.
+echo "${db_endpoint}" > /tmp/db_endpoint.txt
+chmod 644 /tmp/db_endpoint.txt

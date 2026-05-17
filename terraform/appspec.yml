@@ -1,0 +1,10 @@
+version: 0.0
+os: linux
+files:
+  - source: web/
+    destination: /var/www/html/
+hooks:
+  AfterInstall:
+    - location: scripts/fix_conexion.sh
+      timeout: 180
+      runas: root
