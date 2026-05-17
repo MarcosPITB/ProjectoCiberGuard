@@ -13,7 +13,9 @@ if [ -f "$CACHE_ENDPOINT" ]; then
     
     # Reemplazar la línea de localhost por la del endpoint real en el archivo final
     if [ -f "$TARGET_FILE" ]; then
-        sed -i 's/$host = "localhost";/$host = "'"$REAL_ENDPOINT"'/g' "$TARGET_FILE"
+        # SOLUCIÓN: Buscamos "localhost" de forma aislada y lo cambiamos por el endpoint real.
+        # Usamos '|' como delimitador de sed para evitar conflictos de caracteres.
+        sed -i "s|localhost|$REAL_ENDPOINT|g" "$TARGET_FILE"
         echo "Sustitución en conexion.php completada con éxito."
     else
         echo "ERROR: El archivo conexion.php no fue encontrado por CodeDeploy."
