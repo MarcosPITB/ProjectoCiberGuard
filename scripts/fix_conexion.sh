@@ -1,6 +1,3 @@
-cd ~/Downloads/projectoCyberGuard
-
-cat << 'EOF' > scripts/fix_conexion.sh
 #!/bin/bash
 # scripts/fix_conexion.sh
 
@@ -40,6 +37,3 @@ fi
 chown -R www-data:www-data /var/www/html
 chmod -R 775 /var/www/html
 echo "=== Proceso post-despliegue finalizado con éxito ==="
-EOF
-
-chmod +x scripts/fix_conexion.sh
